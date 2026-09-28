@@ -1,45 +1,64 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useState } from 'react';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+  NavigationContainer,
+} from '@react-navigation/native';
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+import AppNavigator from './src/navigation/AppNavigator';
+
+import { initialStudents } from './src/data/studentData';
+
+import { Student } from './src/types/Student';
+
+const App = () => {
+
+  const [students, setStudents] =
+    useState<Student[]>(initialStudents);
+
+  // THÊM
+  const addStudent = (student: Student) => {
+    setStudents(prevStudents => [
+      ...prevStudents,
+      student,
+    ]);
+  };
+
+  // SỬA
+  const updateStudent = (
+    updatedStudent: Student,
+  ) => {
+    setStudents(prevStudents =>
+      prevStudents.map(student =>
+        student.id === updatedStudent.id
+          ? updatedStudent
+          : student,
+      ),
+    );
+  };
+
+  // XÓA
+  const deleteStudent = (
+    studentId: string,
+  ) => {
+    setStudents(prevStudents =>
+      prevStudents.filter(
+        student => student.id !== studentId,
+      ),
+    );
+  };
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
-}
+    <NavigationContainer>
 
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
+      <AppNavigator
+        students={students}
+        addStudent={addStudent}
+        updateStudent={updateStudent}
+        deleteStudent={deleteStudent}
       />
-    </View>
-  );
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+    </NavigationContainer>
+  );
+};
 
 export default App;
